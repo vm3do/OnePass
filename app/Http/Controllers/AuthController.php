@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\LoginAttemptWarningMail;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Validator;
 
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Mail;
@@ -15,11 +16,17 @@ class AuthController extends Controller
 {
     public function register(Request $request){
 
-        $validated = $request->validate([
+        $validated = Validator::make($request->all(), [
             'name' => 'required|min:3',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed'
         ]);
+
+        if($validated->fails()){
+            return response()->json([
+                'error registering' => $validated->errors()
+            ], 401);
+        }
 
         $validated['password'] = Hash::make($validated['password']);
 
@@ -38,10 +45,16 @@ class AuthController extends Controller
     
     public function login(Request $request){
 
-        $request->validate([
+        $validated = Validator::make($request->all(), [
             'email' => 'required|exists:users',
             'password' => 'min:6|required',
         ]);
+
+        if($validated->fails()){
+            return response()->json([
+                'error login in' => $validated->errors()
+            ], 401);
+        }
         $key='user_email:'.$request->email;
        if (RateLimiter::tooManyAttempts($key,3)) {
         if (!Cache::has('alert_sent_by'.$request->email)) {
@@ -74,8 +87,12 @@ class AuthController extends Controller
 
     }
     
-    public function logout(){
+    public function logout(Request $request){
+        $request->user()->tokens()->delete();
 
+        return response()->json([
+            'message' => 'you are logged out'
+        ], 200);
     }
     
 }
