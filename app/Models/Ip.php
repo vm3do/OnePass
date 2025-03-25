@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ip extends Model
 {
-    //
+    protected $fillable = ['ip', 'status'];
 }
