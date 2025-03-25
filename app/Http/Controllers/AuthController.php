@@ -6,16 +6,23 @@ use App\Models\Ip;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
     public function register(Request $request){
 
-        $validated = $request->validate([
+        $validated = Validator::make($request->all(), [
             'name' => 'required|min:3',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed'
         ]);
+
+        if($validated->fails()){
+            return response()->json([
+                'error registering' => $validated->errors()
+            ], 401);
+        }
 
         $validated['password'] = Hash::make($validated['password']);
 
@@ -34,10 +41,16 @@ class AuthController extends Controller
     
     public function login(Request $request){
 
-        $request->validate([
+        $validated = Validator::make($request->all(), [
             'email' => 'required|exists:users',
             'password' => 'min:6|required',
         ]);
+
+        if($validated->fails()){
+            return response()->json([
+                'error login in' => $validated->errors()
+            ], 401);
+        }
 
         $user = User::where('email', $request->email)->first();
         if(!$user || !Hash::check($request->password, $user->password)){
