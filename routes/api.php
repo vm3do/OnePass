@@ -13,4 +13,4 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::post('/passwords/import', [PasswordController::class, 'importPasswords'])->middleware('auth:sanctum');
+Route::post('/import-passwords', [PasswordController::class, 'importPasswords'])->middleware('auth:sanctum');
