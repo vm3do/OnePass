@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ip;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -15,8 +17,18 @@ class AuthController extends Controller
             'password' => 'required|min:6|confirmed'
         ]);
 
-        User::create($validated);
-        
+        $validated['password'] = Hash::make($validated['password']);
+
+        $user = User::create($validated);
+        $user_ip = Ip::create(['ip' => $request->ip()]);
+
+        $token = $user->createToken($validated['email']);
+
+        return response()->json([
+            'user' => $user,
+            'user_ip' => $user_ip,
+            'token' => $token->plainTextToken,
+        ], 201);
 
     }
     
