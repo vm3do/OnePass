@@ -57,7 +57,7 @@ class PasswordController extends Controller
      */
     public function importPasswords(Request $request)
     {
-        //Check if the file is provided
+        //Check if the file is uploaded
         if (!$request->hasFile('file')) {
             return response()->json(['message' => 'No file uploaded.'], 400);
         }
@@ -69,8 +69,8 @@ class PasswordController extends Controller
             return response()->json(['message' => 'The file must be a .CSV format'], 400);
         }
 
-        // Get the currently authenticated user
-        // $user = auth()->user();
+        // Get the current logged user
+        $user = $request->user()->id;
 
         // Read the CSV file using the League CSV package
         $csv = Reader::createFromPath($file->getRealPath(), 'r');
@@ -96,8 +96,7 @@ class PasswordController extends Controller
             DB::table('passwords')->insert([
                 'site_name' => $serviceName,
                 'password' => $password,
-                // 'user_id' => $user->id(),
-                'user_id' => 1,
+                'user_id' => $user,
             ]);
         }
 
