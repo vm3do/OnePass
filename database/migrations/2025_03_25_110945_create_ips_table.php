@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('ips', function (Blueprint $table) {
             $table->id();
             $table->string('ip');
-            $table->enum('status', ['black', 'white']);
+            $table->enum('status', ['black', 'white'])->default('white');
             $table->timestamps();
         });
     }
