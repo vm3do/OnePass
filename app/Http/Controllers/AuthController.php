@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\LoginAttemptWarningMail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
@@ -36,7 +37,10 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $user_ip = Ip::create(['ip' => $request->ip()]);
+        $user_ip = Ip::create([
+            'ip' => $request->ip(),
+            'user_id' => $user->id,
+        ]);
 
         $token = $user->createToken($request->email);
 

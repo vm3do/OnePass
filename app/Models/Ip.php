@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ip extends Model
 {
-    protected $fillable = ['ip', 'status'];
+    protected $fillable = ['ip', 'status', 'user_id'];
 
     public function user(){
         return $this->belongsTo(User::class);
