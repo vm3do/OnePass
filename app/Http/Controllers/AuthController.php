@@ -62,7 +62,7 @@ class AuthController extends Controller
         }
 
         $key = 'user_email:' . $request->email;
-        if (RateLimiter::tooManyAttempts($key, 3600)) {
+        if (RateLimiter::tooManyAttempts($key, 10)) {
             if (!Cache::has('alert_sent_by' . $request->email)) {
                 Mail::to($request->email)->send(new  LoginAttemptWarningMail());
                 Cache::put('alert_sent_by' . $request->email, true, 3600);
