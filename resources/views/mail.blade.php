@@ -1,12 +1,5 @@
-<div class="container">
-        <div class="header">
-            <h1>Alerte de Connexion Suspecte</h1>
-        </div>
-        <div class="message">
-            <p>Bonjour,</p>
-            <p>Nous avons détecté plusieurs tentatives de connexion échouées sur votre compte. Si vous ne reconnaissez pas cette activité, il est recommandé de prendre des mesures pour sécuriser votre compte.</p>
-            <p>Si vous avez besoin d'aide ou si vous pensez que votre compte a été compromis, veuillez cliquer sur le bouton ci-dessous pour sécuriser votre compte :</p>
-        
-        </div>
-       
-    </div>
+<p>Bonjour,</p>
+<p>Nous avons détecté un grand nombre de tentatives de connexion à votre compte. Pour des raisons de sécurité, l'accès est temporairement bloqué pendant 1 heure.</p>
+<p>Si vous pensez que cela est une erreur, veuillez contacter le support.</p>
+<p>Cordialement,</p>
+<p>L'équipe de sécurité</p>
