@@ -24,12 +24,15 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $validated['password'] = Hash::make($validated['password']);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
 
-        $user = User::create($validated);
         $user_ip = Ip::create(['ip' => $request->ip()]);
 
-        $token = $user->createToken($validated['email']);
+        $token = $user->createToken($request->email);
 
         return response()->json([
             'user' => $user,
