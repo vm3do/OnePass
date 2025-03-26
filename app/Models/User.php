@@ -3,10 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Ip;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 // use app\Models\Passwords;
 
 class User extends Authenticatable
@@ -48,7 +49,10 @@ class User extends Authenticatable
         ];
     }
 
-
+    public function ips(){
+        return $this->hasMany(Ip::class);
+    }
+    
     public function passwords()
     {
         return $this->hasMany(Passwords::class);

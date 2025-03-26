@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\LoginAttemptWarningMail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
@@ -36,7 +37,10 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $user_ip = Ip::create(['ip' => $request->ip()]);
+        $user_ip = Ip::create([
+            'ip' => $request->ip(),
+            'user_id' => $user->id,
+        ]);
 
         $token = $user->createToken($request->email);
 
@@ -62,13 +66,17 @@ class AuthController extends Controller
         }
 
         $key = 'user_email:' . $request->email;
-
-        if (RateLimiter::tooManyAttempts($key, 3)) {
-
+        if (RateLimiter::tooManyAttempts($key, 10)) {
             if (!Cache::has('alert_sent_by' . $request->email)) {
                 Mail::to($request->email)->send(new  LoginAttemptWarningMail());
                 Cache::put('alert_sent_by' . $request->email, true, 3600);
             }
+
+            if (Cache::has($key . ':blocked')) {
+                return response()->json(['message' => 'Vous êtes bloqué pendant une heure.'], 429);
+            }
+            Cache::put($key . ':blocked', true, 3600);
+
 
             return response()->json(['message' => 'Trop de tentatives, veuillez réessayer plus tard.'], 429);
         }
@@ -81,8 +89,7 @@ class AuthController extends Controller
                 'error' => 'incorrect credentials'
             ], 401);
         };
-
-        RateLimiter::hit($key, 180);
+        // RateLimiter::hit($key, 180);
 
         RateLimiter::clear($key);
         $token = $user->createToken($user->email);
