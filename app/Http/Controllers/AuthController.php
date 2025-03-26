@@ -10,9 +10,12 @@ use App\Mail\LoginAttemptWarningMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
+use App\Mail\NewDeviceNotification;
+
 
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Mail;
+
 
 class AuthController extends Controller
 {
@@ -65,6 +68,9 @@ class AuthController extends Controller
             ], 401);
         }
 
+
+
+
         $key = 'user_email:' . $request->email;
         if (RateLimiter::tooManyAttempts($key, 10)) {
             if (!Cache::has('alert_sent_by' . $request->email)) {
@@ -82,7 +88,7 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
-        
+
         if (!$user || !Hash::check($request->password, $user->password)) {
             RateLimiter::increment($key);
             return response()->json([
@@ -91,6 +97,12 @@ class AuthController extends Controller
         };
         // RateLimiter::hit($key, 180);
 
+
+
+        $this->verificationIp($user, $request->ip);
+
+
+
         RateLimiter::clear($key);
         $token = $user->createToken($user->email);
 
@@ -98,6 +110,35 @@ class AuthController extends Controller
             'user' => $user,
             'token' => $token->plainTextToken,
         ], 201);
+
+
+
+    }
+
+
+    public function verificationIp($user, $ip){
+        $ip = '192.23.33.790';
+        $existIp = Ip::where('user_id', $user->id)->where('ip', $ip)->exists();
+        if (!$existIp) {
+            $validationCode = rand(100000, 999999);
+            Cache::put('validation_code_' . $user->id, $validationCode, 300);
+            $cachedCode = Cache::get('validation_code_' . $user->id);
+
+            if (!$cachedCode) {
+                return response()->json(['message' => 'Validation code expired or not found.'], 404);
+            }
+
+            $newIp = Ip::create([
+                'ip' => $ip,
+                'user_id' => $user->id,
+                'status' => 'White'
+            ]);
+
+            Mail::to($user->email)->send(new NewDeviceNotification($newIp, $validationCode));
+
+            return response()->json(['message' => 'Nouvel appareil détecté. Veuillez vérifier votre email.']);
+
+        }
     }
 
     public function logout(Request $request)
