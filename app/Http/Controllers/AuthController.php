@@ -30,12 +30,15 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $validated['password'] = Hash::make($validated['password']);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
 
-        $user = User::create($validated);
         $user_ip = Ip::create(['ip' => $request->ip()]);
 
-        $token = $user->createToken($validated['email']);
+        $token = $user->createToken($request->email);
 
         return response()->json([
             'user' => $user,
@@ -52,11 +55,12 @@ class AuthController extends Controller
             'password' => 'min:6|required',
         ]);
 
-        if ($validated->fails()) {
+        if($validated->fails()) {
             return response()->json([
                 'error login in' => $validated->errors()
             ], 401);
         }
+
         $key = 'user_email:' . $request->email;
         if (RateLimiter::tooManyAttempts($key, 3600)) {
             if (!Cache::has('alert_sent_by' . $request->email)) {
@@ -74,6 +78,7 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
+        
         if (!$user || !Hash::check($request->password, $user->password)) {
             RateLimiter::increment($key);
             return response()->json([
