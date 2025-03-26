@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('ip');
             $table->enum('status', ['black', 'white'])->default('white');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
