@@ -22,3 +22,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('passwords/{id}', [PasswordController::class, 'update']);
     Route::delete('passwords/{id}', [PasswordController::class, 'destroy']);
 });
+
