@@ -16,11 +16,12 @@ class WhiteList
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(!Ip::where('user_id', auth()->id())->where('status', 'white')->exists()){
-            return response()->json([
-                'error' => 'Access denied. Ip is not whitelisted'
-            ]);
-        }
+            if(!Ip::where('ip', $request->ip())->where('user_id', auth()->id())->where('status', 'white')->exists()){
+                return response()->json([
+                    'error' => 'Access denied. Your Ip is not whitelisted'
+                ], 403);
+            }
+        
         return $next($request);
-    }
+        }
 }

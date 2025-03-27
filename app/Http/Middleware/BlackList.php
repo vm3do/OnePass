@@ -16,13 +16,13 @@ class BlackList
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $ip = $request->ip;
+        // dd($request->ip());
+        $ip = $request->ip();
         if(Ip::where('ip', $ip)->where('status', 'black')->exists()){
             return response()->json([
-                'error' => 'Access denied. You cannot access this page'
+                'error' => 'Access denied. Your Ip is blacklisted'
             ], 403);
         }
-
         return $next($request);
     }
 }
