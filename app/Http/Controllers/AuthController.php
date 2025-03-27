@@ -94,6 +94,8 @@ class AuthController extends Controller
         RateLimiter::clear($key);
         $token = $user->createToken($user->email);
 
+       
+        
         return response()->json([
             'user' => $user,
             'token' => $token->plainTextToken,
