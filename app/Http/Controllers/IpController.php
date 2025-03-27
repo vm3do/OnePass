@@ -69,4 +69,70 @@ class IpController extends Controller
             'ip' => $ip,
         ], 200);
     }
+
+    public function removeBlacklisted(Request $request){
+
+        if(auth()->user()->role !== 'admin'){
+            return response()->json([
+                'error' => 'Unauthorized'
+            ], 403);
+        }
+
+        $validated = Validator::make($request->all(), [
+            'ip' => 'required|ip'
+        ]);
+
+        if($validated->fails()){
+            return response()->json([
+                'error' => 'Unable to remove the IP. Please ensure the IP is valid and try again.'
+            ], 422);
+        }
+
+        $ip = Ip::where('ip', $request->ip)->where('status', 'black')->first();
+
+        if(!$ip){
+            return response()->json([
+                'error' => 'IP not found'
+            ], 404);
+        }
+
+        $ip->delete();
+
+        return response()->json([
+            'message' => 'IP deleted successfully',
+        ], 200);
+    }
+
+    public function removeWhitelisted(Request $request){
+
+        if(auth()->user()->role == 'admin'){
+            return response()->json([
+                'error' => 'Unauthorized'
+            ], 403);
+        }
+
+        $validated = Validator::make($request->all(), [
+            'ip' => 'required|ip'
+        ]);
+
+        if($validated->fails()){
+            return response()->json([
+                'error' => 'Unable to remove the IP. Please ensure the IP is valid and try again.'
+            ], 422);
+        }
+
+        $ip = Ip::where('ip', $request->ip)->where('status', 'white')->first();
+
+        if(!$ip){
+            return response()->json([
+                'error' => 'IP not found'
+            ], 404);
+        }
+
+        $ip->delete();
+
+        return response()->json([
+            'message' => 'IP deleted successfully',
+        ], 200);
+    }
 }
