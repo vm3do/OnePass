@@ -21,7 +21,7 @@ class IpController extends Controller
     public function blacklist(Request $request)
     {
 
-        if (!Auth::user()->role == 'admin') {
+        if (auth()->user()->role !== 'admin') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 

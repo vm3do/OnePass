@@ -14,8 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->prepend(BlackList::class);
         $middleware->alias(['blacklist' => BlackList::class, 'whitelist' => WhiteList::class]);
-        $middleware->prepend(['blacklist' => BlackList::class,]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
