@@ -1,10 +1,14 @@
-<html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérification de l'appareil</title>
+</head>
 <body>
-    <h2>Nouvelle connexion détectée</h2>
-    <p>Bonjour,</p>
-    <p>Une connexion a été détectée à partir d'un nouvel appareil. L'adresse IP utilisée est : {{ $ip->ip }}.</p>
-    <p>Si ce n'était pas vous, veuillez prendre des mesures immédiates pour sécuriser votre compte.</p>
-    <p>Merci,</p>
-    <p>L'équipe de sécurité</p>
+    <h1>Bonjour,</h1>
+    <p>Nous avons détecté une tentative de connexion depuis un nouvel appareil avec l'IP suivante : {{ $verificationLink }}</p>
+    <p>Veuillez cliquer sur le lien ci-dessous pour confirmer votre connexion :</p>
+    <a href="{{ $verificationLink }}">Cliquez ici pour valider votre connexion</a>
 </body>
 </html>

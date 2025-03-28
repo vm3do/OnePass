@@ -23,4 +23,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('passwords/{id}', [PasswordController::class, 'destroy']);
 });
 
-
+// Route::post('/validate-login-code/{token}', [AuthController::class, 'validateLoginCode']);
+Route::get('/verify-ip', [AuthController::class, 'verifyIp'])->name('verify-ip');

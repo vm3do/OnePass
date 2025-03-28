@@ -13,16 +13,16 @@ class NewDeviceNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $ip;
-    public $validationCode ;
+    public $verificationLink;
+
 
     /**
      * Create a new message instance.
      */
-    public function __construct($ip, $validationCode)
+    public function __construct($verificationLink)
     {
-        $this->ip = $ip;
-        $this->validationCode = $validationCode;
+        $this->verificationLink = $verificationLink;
+
     }
 
     /**
@@ -31,7 +31,7 @@ class NewDeviceNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Device Notification',
+            subject: 'Vérification de connexion - Nouveau périphérique détecté'
         );
     }
 
@@ -43,8 +43,7 @@ class NewDeviceNotification extends Mailable
         return new Content(
             view: 'emails.mail',
             with: [
-                'ip' => $this->ip,
-                'validationCode' => $this->validationCode,
+                'verificationToken' => $this->verificationLink,
             ],
         );
     }
