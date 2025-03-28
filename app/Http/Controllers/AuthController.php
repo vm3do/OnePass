@@ -102,7 +102,7 @@ class AuthController extends Controller
         /* ***************************
         ********* verification ip ****
         ******************************/
-        $userIp = "155.33.34.20";
+        $userIp = $request->ip();
         // Check if this IP is registered
         $exists = Ip::where('user_id', $user->id)->where('ip', $userIp)->exists();
 
