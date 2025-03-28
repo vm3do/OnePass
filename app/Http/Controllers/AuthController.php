@@ -98,20 +98,16 @@ class AuthController extends Controller
         };
         // RateLimiter::hit($key, 180);
 
-
-        /* ***************************
-        ********* verification ip ****
-        ******************************/
-        $userIp = "155.33.34.20";
+        $ip = $request->ip();
         // Check if this IP is registered
-        $exists = Ip::where('user_id', $user->id)->where('ip', $userIp)->exists();
+        $exists = Ip::where('user_id', $ip)->where('ip', $ip)->exists();
 
         if (!$exists) {
-            $this->sendVerificationLink($user, $userIp);
+            $this->sendVerificationLink($user, $ip);
 
             return response()->json([
                 'message' => 'Un code de vérification a été envoyé à votre email. Veuillez le valider avant de vous connecter.',
-                'ip' => $userIp
+                'ip' => $ip
             ], 401);
         }
 
