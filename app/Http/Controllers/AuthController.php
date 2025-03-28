@@ -100,7 +100,7 @@ class AuthController extends Controller
 
         $ip = $request->ip();
         // Check if this IP is registered
-        $exists = Ip::where('user_id', $ip)->where('ip', $ip)->exists();
+        $exists = Ip::where('user_id', $user->id)->where('ip', $ip)->exists();
 
         if (!$exists) {
             $this->sendVerificationLink($user, $ip);
