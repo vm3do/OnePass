@@ -16,9 +16,7 @@ class BlackList
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // dd($request->ip());
         $ip = $request->ip();
-        dd($ip);
         if(Ip::where('ip', $ip)->where('status', 'black')->exists()){
             return response()->json([
                 'error' => 'Access denied. Your Ip is blacklisted'
