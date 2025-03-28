@@ -15,10 +15,13 @@ Route::middleware('blacklist')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 
+    Route::get('/verify-ip', [AuthController::class, 'verifyIp'])->name('verify-ip');
+
+    
     Route::middleware(['auth:sanctum', 'whitelist'])->group(function () {
 
         Route::post('/logout', [AuthController::class, 'logout']);
-        
+
         Route::get('passwords', [PasswordController::class, 'index']);
         Route::post('passwords', [PasswordController::class, 'store']);
         Route::get('passwords/{id}', [PasswordController::class, 'show']);

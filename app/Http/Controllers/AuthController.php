@@ -8,11 +8,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\LoginAttemptWarningMail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
+use App\Mail\NewDeviceNotification;
+
 
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Mail;
+
 
 class AuthController extends Controller
 {
@@ -65,6 +69,9 @@ class AuthController extends Controller
             ], 401);
         }
 
+
+
+
         $key = 'user_email:' . $request->email;
         if (RateLimiter::tooManyAttempts($key, 10)) {
             if (!Cache::has('alert_sent_by' . $request->email)) {
@@ -82,7 +89,7 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
-        
+
         if (!$user || !Hash::check($request->password, $user->password)) {
             RateLimiter::increment($key);
             return response()->json([
@@ -91,6 +98,23 @@ class AuthController extends Controller
         };
         // RateLimiter::hit($key, 180);
 
+
+        /* ***************************
+        ********* verification ip ****
+        ******************************/
+        $userIp = "155.33.34.20";
+        // Check if this IP is registered
+        $exists = Ip::where('user_id', $user->id)->where('ip', $userIp)->exists();
+
+        if (!$exists) {
+            $this->sendVerificationLink($user, $userIp);
+
+            return response()->json([
+                'message' => 'Un code de vérification a été envoyé à votre email. Veuillez le valider avant de vous connecter.',
+                'ip' => $userIp
+            ], 401);
+        }
+
         RateLimiter::clear($key);
         $token = $user->createToken($user->email);
 
@@ -98,7 +122,75 @@ class AuthController extends Controller
             'user' => $user,
             'token' => $token->plainTextToken,
         ], 201);
+
+
+
     }
+
+    public function sendVerificationLink($user, $newIp)
+    {
+        $exists = Ip::where('user_id', $user->id)->where('ip', $newIp)->exists();
+
+        if (!$exists) {
+            $verificationToken = Str::random(60);
+            $expiresAt = now()->addMinutes(10);
+
+            // Store verification details in cache
+            $cacheKey = "verification_link_{$verificationToken}";
+            Cache::put($cacheKey, [
+                'user_id' => $user->id,
+                'ip' => $newIp,
+                'token' => $verificationToken
+            ], $expiresAt);
+
+            // Generate verification link
+            $verificationLink = url('/api/verify-ip') . "?token={$verificationToken}&ip={$newIp}";
+
+            Mail::to($user->email)->send(new NewDeviceNotification($verificationLink));
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+
+    public function verifyIp(Request $request)
+    {
+        $token = $request->query('token');
+        $ip = $request->query('ip');
+
+        if (!$token || !$ip) {
+            return response()->json(['error' => 'Token ou IP manquant.'], 400);
+        }
+
+        // Get cache key
+        $cacheKey = "verification_link_{$token}";
+        $cachedData = Cache::get($cacheKey);
+
+        if (!$cachedData) {
+            return response()->json(['error' => 'Lien de vérification expiré ou invalide.'], 401);
+        }
+
+        if ($cachedData['token'] !== $token) {
+            return response()->json(['error' => 'Token invalide.'], 401);
+        }
+
+        Ip::create([
+            'ip' => $ip,
+            'user_id' => $cachedData['user_id'],
+            'status' => 'White'
+        ]);
+
+        // Remove cache entry after successful verification
+        Cache::forget($cacheKey);
+
+        return response()->json(['message' => 'IP validée avec succès. Vous pouvez maintenant vous connecter.'], 200);
+    }
+
+
+
 
     public function logout(Request $request)
     {

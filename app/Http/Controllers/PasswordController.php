@@ -22,9 +22,15 @@ class PasswordController extends Controller
     public function index()
     {
         $passwords = Auth::user()->passwords;
-        return response()->json($passwords);
+        if($passwords->isEmpty()){
+            return response()->json([
+                'message' => 'Password not found',
+            ], 404);
+        }
+        return response()->json([
+            'passwords' => $passwords,
+        ]);
     }
-
 
     public function store(Request $request)
     {
