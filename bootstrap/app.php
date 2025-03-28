@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\BlackList;
+use App\Http\Middleware\WhiteList;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,7 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->prepend(BlackList::class);
+        $middleware->alias(['blacklist' => BlackList::class, 'whitelist' => WhiteList::class]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
