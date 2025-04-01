@@ -6,9 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PasswordController;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
+
+
 
 Route::middleware('blacklist')->group(function () {
 
@@ -30,12 +29,12 @@ Route::middleware('blacklist')->group(function () {
         Route::post('/import-passwords', [PasswordController::class, 'importPasswords']);
 
         Route::post('/ips/whitelist', [IpController::class, 'whitelist']);
-        Route::delete('/ips/delete/whitelisted', [IpController::class, 'removeWhitelisted']);
+        Route::delete('/ips/whitelist/delete/{id}', [IpController::class, 'removeWhitelisted']);
     });
 
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/ips', [IpController::class, 'index']);
         Route::post('/ips/blacklist', [IpController::class, 'blacklist']);
-        Route::delete('/ips/delete/blacklisted', [IpController::class, 'removeBlacklisted']);
+        Route::delete('/ips/blacklist/delete/{id}', [IpController::class, 'removeBlacklisted']);
     });
 });
