@@ -59,10 +59,10 @@ class IpController extends Controller
             ], 422);
         }
 
-        $ip = Ip::updateOrCreate([
+        $ip = Ip::updateOrCreate(
             ['ip' => $request->ip, 'user_id' => auth()->id()],
             ['status' => 'white'],
-        ]);
+        );
 
         return response()->json([
             'message' => 'IP got blacklisted successfully',
