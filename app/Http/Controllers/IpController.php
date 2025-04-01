@@ -65,7 +65,7 @@ class IpController extends Controller
         );
 
         return response()->json([
-            'message' => 'IP got blacklisted successfully',
+            'message' => 'IP got whitelisted successfully',
             'ip' => $ip,
         ], 200);
     }
@@ -85,7 +85,7 @@ class IpController extends Controller
 
         if (!$ip) {
             return response()->json([
-                'error' => 'IP not found in your whitelist'
+                'error' => 'IP not found in your blaclist'
             ], 404);
         }
 
