@@ -1,66 +1,152 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# OnePass API - Secure Password Management
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 📌 Introduction
 
-## About Laravel
+OnePass is a secure API for managing passwords, allowing users to **create, read, update, and delete** their stored credentials while ensuring data privacy. The API follows a **Zero-Knowledge-like encryption model**, where passwords are encrypted client-side before being sent to the server. It also includes **advanced security features** such as rate limiting, device verification, and IP management.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 🔑 Authentication (Implemented with Laravel Sanctum)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Users must register and log in to interact with the API.
+- Authentication is handled via **Bearer tokens**.
 
-## Learning Laravel
+### 🔐 Password Management (CRUD)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Users can **store, retrieve, update, and delete** their passwords securely.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### ⚡ Rate Limiting
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Limits login attempts to **10 requests per second**.
+- Exceeding the limit results in a **1-hour block**.
+- Users receive an email warning if suspicious activity is detected.
 
-## Laravel Sponsors
+### 📍 Device & IP Management
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- **Device Verification:** Users receive an email confirmation when logging in from a new device.
+- **IP Whitelist & Blacklist:**
+  - Users can add trusted IPs to a whitelist.
+  - Admins can block suspicious IPs.
+  - Users can manage their own whitelist via API routes.
 
-### Premium Partners
+### 🌍 Geolocation Restrictions
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+- API can restrict access based on country settings.
 
-## Contributing
+### 📦 Import Passwords
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- Users can import passwords from **browser-based password managers** (Chrome, Firefox, Safari, etc.).
 
-## Code of Conduct
+## 🛠 Installation
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 1️⃣ Clone the Repository
 
-## Security Vulnerabilities
+```bash
+git clone https://github.com/vm3do/OnePass.git
+cd OnePass
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 2️⃣ Install Dependencies
 
-## License
+```bash
+composer install
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 3️⃣ Configure Environment
+
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+- Update **.env** with your database and mail settings.
+
+### 4️⃣ Migrate Database
+
+```bash
+php artisan migrate
+```
+
+### 5️⃣ Run the Application
+
+```bash
+php artisan serve
+```
+
+## 🔑 Authentication
+
+### Register
+
+```http
+POST /api/register
+```
+
+#### Request Body (JSON)
+
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "12341234",
+  "password_confirmation": "12341234"
+}
+```
+
+### Login
+
+```http
+POST /api/login
+```
+
+#### Response
+
+```json
+{
+  "token": "your-auth-token"
+}
+```
+
+**Use the token for authorization in subsequent requests:**
+
+```http
+Authorization: Bearer your-auth-token
+```
+
+## 📄 API Endpoints
+
+### Password Management
+
+| Method | Endpoint              | Description                 |
+| ------ | --------------------- | --------------------------- |
+| GET    | `/api/passwords`      | Get all saved passwords     |
+| POST   | `/api/passwords`      | Save a new password         |
+| PUT    | `/api/passwords/{id}` | Update an existing password |
+| DELETE | `/api/passwords/{id}` | Delete a password           |
+
+### IP Management
+
+| Method | Endpoint                 | Description                     |
+| ------ | ------------------------ | ------------------------------- |
+| POST   | `/api/ip/whitelist`      | Add an IP to the whitelist      |
+| DELETE | `/api/ip/whitelist/{id}` | Remove an IP from the whitelist |
+| POST   | `/api/ip/blacklist`      | Add an IP to the blacklist      |
+| DELETE | `/api/ip/blacklist/{id}` | Remove an IP from the blacklist |
+
+## 🌍 Deployment
+
+- The API is deployed on **AWS EC2** servers.
+- Uses **SSL/TLS encryption** for secure communication.
+
+## 👥 Contributors
+
+| Name    | Role                                         |
+| ------- | -------------------------------------------- |
+| **Me**  | Scrum Master & Authentication, IP Management |
+| Meryem  | UML Design & Rate Limiting                   |
+| Omar    | Class Diagrams & Password Import Feature     |
+| Souhail | Password CRUD & Device Verification          |
+
+---
+
+**OnePass - Secure Your Passwords with Confidence!** 🔒
+
